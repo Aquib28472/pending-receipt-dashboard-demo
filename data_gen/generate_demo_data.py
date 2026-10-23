@@ -225,10 +225,11 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="data")
     ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("--today", default="2026-10-23", help="anchor date for every generated date (YYYY-MM-DD)")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    tables = build(args.seed)
+    tables = build(args.seed, today=date.fromisoformat(args.today))
     for name, df in tables.items():
         target = out / ("expected_status.csv" if name == "expected_status" else f"{name}.csv")
         df.to_csv(target, index=False)

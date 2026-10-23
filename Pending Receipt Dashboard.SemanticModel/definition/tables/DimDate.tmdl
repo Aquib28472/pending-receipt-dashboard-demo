@@ -1,0 +1,62 @@
+table DimDate
+	lineageTag: 867a5b66-b246-4b4e-a27f-d3501d05ef1d
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: f2dd8cc9-39fa-4097-a3fe-f657426a7971
+		summarizeBy: none
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year = YEAR([Date])
+		dataType: int64
+		formatString: 0
+		lineageTag: 7ae6ed82-092b-450a-b247-45000e55d7a8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNo = MONTH([Date])
+		dataType: int64
+		formatString: 0
+		lineageTag: 91dc80cf-06a2-4131-84f4-23d829fca815
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month = FORMAT([Date], "MMMM")
+		dataType: string
+		lineageTag: 52349c25-9191-4807-8b8f-905e4a20ab03
+		summarizeBy: none
+		sortByColumn: MonthNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year-Month = FORMAT([Date], "yyyy-MM")
+		dataType: string
+		lineageTag: d5fdefbf-4777-4694-be41-cdb9b841c31d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Date Hierarchy'
+		lineageTag: 837c1ecc-907c-48c7-92cc-9177d3b8f3ef
+
+		level Year
+			lineageTag: c9bb0216-02c5-48d9-99e6-2a003c291220
+			column: Year
+
+		level Month
+			lineageTag: be789541-828c-4d8a-acec-7b6965cc8efa
+			column: Month
+
+	partition DimDate = calculated
+		mode: import
+		source = CALENDAR(DATE(2020, 1, 1), DATE(2031, 12, 31))
+

@@ -1,0 +1,150 @@
+/// Territory and region owner alignment (synthetic demo data). Lookup keys pick one row per key so the owner can be resolved without ambiguity.
+table OwnerAlignment
+	lineageTag: 278b2e7d-28b1-4077-aa35-91adf301108b
+
+	column bu
+		dataType: string
+		lineageTag: 24c342e0-31c3-4df9-b61c-276ae948797f
+		sourceColumn: bu
+
+	column area
+		dataType: string
+		lineageTag: 2db9e071-6aa8-402c-94cd-d8d84e66f07a
+		sourceColumn: area
+
+	column region_id
+		dataType: string
+		lineageTag: e01c5517-4782-4cef-b9b7-482e19654139
+		sourceColumn: region_id
+
+	column region_name
+		dataType: string
+		lineageTag: ff98ea8f-5686-4ebb-9f98-88885b8b4da6
+		sourceColumn: region_name
+
+	column region_manager
+		dataType: string
+		lineageTag: 7040784e-cdb4-493d-af17-3bef937f45ed
+		sourceColumn: region_manager
+
+	column territory_id
+		dataType: string
+		lineageTag: 063e9a1b-e71a-472d-bf78-89af5b073f30
+		sourceColumn: territory_id
+
+	column territory_name
+		dataType: string
+		lineageTag: 23d66429-155a-4910-bdc9-9e7ed2245095
+		sourceColumn: territory_name
+
+	column field_associate
+		dataType: string
+		lineageTag: 1a1e0e38-095f-4590-b49d-2e460c8f2e09
+		sourceColumn: field_associate
+
+	column field_associate_email
+		dataType: string
+		lineageTag: e9e40162-93ef-46ed-bf41-55a4cf1f24dc
+		sourceColumn: field_associate_email
+
+	column acct_no
+		dataType: string
+		lineageTag: 0deecfc2-213c-4738-bf78-41c33a90bd30
+		sourceColumn: acct_no
+
+	column owner_rep
+		dataType: string
+		lineageTag: 3bccd728-be74-4d7d-ad81-4da88f994198
+		sourceColumn: owner_rep
+
+	column owner_consign
+		dataType: string
+		lineageTag: 3173e83b-c5bf-41cd-b962-2cff3915b201
+		sourceColumn: owner_consign
+
+	column REP
+		dataType: string
+		lineageTag: fb56f83e-1243-403b-bca3-694cb8f4a5ee
+		summarizeBy: none
+		sourceColumn: REP
+
+		annotation SummarizationSetBy = Automatic
+
+	column CONSIGN
+		dataType: string
+		lineageTag: 0bbb906e-8993-4af4-90a3-15aa527d5f53
+		summarizeBy: none
+		sourceColumn: CONSIGN
+
+		annotation SummarizationSetBy = Automatic
+
+	column src_idx
+		dataType: int64
+		formatString: 0
+		lineageTag: 7d0cb6a3-2d19-49aa-87a8-61a661c5cad2
+		summarizeBy: none
+		sourceColumn: src_idx
+
+		annotation SummarizationSetBy = Automatic
+
+	column region_lookup_key
+		dataType: string
+		lineageTag: f90eef02-4bd8-4505-b51c-063879c92831
+		summarizeBy: none
+		sourceColumn: region_lookup_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column territory_lookup_key
+		dataType: string
+		lineageTag: 8149eb94-5ee0-4904-b307-364a8a23c11e
+		summarizeBy: none
+		sourceColumn: territory_lookup_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column acct_lookup_key
+		dataType: string
+		lineageTag: b1272fee-aaa7-48ba-b51a-b481fe98bf18
+		summarizeBy: none
+		sourceColumn: acct_lookup_key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition OwnerAlignment = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "owner_alignment.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    #"Renamed Columns" = Table.RenameColumns(#"Promoted Headers", {
+				        {"BU", "bu"}, {"AREA", "area"}, {"Region ID", "region_id"}, {"Region Name", "region_name"},
+				        {"Region Manager", "region_manager"}, {"Territory ID", "territory_id"}, {"Territory Name", "territory_name"},
+				        {"Field Associate", "field_associate"}, {"Email Address", "field_associate_email"}, {"Acct #", "acct_no"},
+				        {"OWNER - REP", "owner_rep"}, {"OWNER - CONSIGN", "owner_consign"}
+				    }),
+				    #"Removed Blank BU" = Table.SelectRows(#"Renamed Columns", each [bu] <> null and Text.Trim(Text.From([bu])) <> ""),
+				    #"Added Src Idx" = Table.AddIndexColumn(#"Removed Blank BU", "src_idx", 0, 1, Int64.Type),
+				    #"Added key_region" = Table.AddColumn(#"Added Src Idx", "key_region", each
+				        let b = Text.Upper(Text.Trim(Text.From([bu]))), r = Text.Upper(Text.Trim(Text.From([region_id] ?? "")))
+				        in if r = "" then null else b & "|" & r, type text),
+				    #"Added key_territory" = Table.AddColumn(#"Added key_region", "key_territory", each
+				        let t = Text.Upper(Text.Trim(Text.From([territory_id] ?? "")))
+				        in if t = "" then null else t, type text),
+				    #"Added key_acct" = Table.AddColumn(#"Added key_territory", "key_acct", each
+				        let b = Text.Upper(Text.Trim(Text.From([bu]))), a = Text.Upper(Text.Trim(Text.From([acct_no] ?? "")))
+				        in if a = "" then null else b & "|" & a, type text),
+				    Keyed = Table.Buffer(#"Added key_acct"),
+				    #"Added region_lookup_key" = Table.AddColumn(Keyed, "region_lookup_key", each
+				        let k = [key_region], i = [src_idx]
+				        in if k = null then null else if i = List.Min(Table.SelectRows(Keyed, (r) => r[key_region] = k)[src_idx]) then k else null, type text),
+				    #"Added territory_lookup_key" = Table.AddColumn(#"Added region_lookup_key", "territory_lookup_key", each
+				        let k = [key_territory], i = [src_idx]
+				        in if k = null then null else if i = List.Max(Table.SelectRows(Keyed, (r) => r[key_territory] = k)[src_idx]) then k else null, type text),
+				    #"Added acct_lookup_key" = Table.AddColumn(#"Added territory_lookup_key", "acct_lookup_key", each
+				        let k = [key_acct], i = [src_idx]
+				        in if k = null then null else if i = List.Max(Table.SelectRows(Keyed, (r) => r[key_acct] = k)[src_idx]) then k else null, type text),
+				    #"Removed Key Helpers" = Table.RemoveColumns(#"Added acct_lookup_key", {"key_region", "key_territory", "key_acct"})
+				in
+				    #"Removed Key Helpers"
+

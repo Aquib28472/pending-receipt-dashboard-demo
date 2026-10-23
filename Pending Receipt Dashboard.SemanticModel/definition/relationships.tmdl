@@ -1,0 +1,5 @@
+relationship bf02ddc1-059b-4187-9553-ebfeba5d6c40
+	joinOnDateBehavior: datePartOnly
+	fromColumn: PendingReceipt.'Issue Posting Date'
+	toColumn: DimDate.Date
+

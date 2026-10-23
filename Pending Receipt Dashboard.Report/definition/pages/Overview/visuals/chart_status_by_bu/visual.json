@@ -1,0 +1,208 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "chart_status_by_bu",
+  "position": {
+    "x": 550,
+    "y": 248,
+    "z": 0,
+    "height": 216,
+    "width": 450,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PendingReceipt"
+                    }
+                  },
+                  "Property": "BU"
+                }
+              },
+              "queryRef": "PendingReceipt.BU",
+              "nativeQueryRef": "BU",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PendingReceipt"
+                    }
+                  },
+                  "Property": "Pending Receipt Lines"
+                }
+              },
+              "queryRef": "PendingReceipt.Pending Receipt Lines",
+              "nativeQueryRef": "Pending Receipt Lines"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PendingReceipt"
+                    }
+                  },
+                  "Property": "Return In Transit Lines"
+                }
+              },
+              "queryRef": "PendingReceipt.Return In Transit Lines",
+              "nativeQueryRef": "Return In Transit Lines"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PendingReceipt"
+                    }
+                  },
+                  "Property": "Verify Lines"
+                }
+              },
+              "queryRef": "PendingReceipt.Verify Lines",
+              "nativeQueryRef": "Verify Lines"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PendingReceipt"
+                    }
+                  },
+                  "Property": "Overdue Pending Lines"
+                }
+              },
+              "queryRef": "PendingReceipt.Overdue Pending Lines",
+              "nativeQueryRef": "Overdue Pending Lines"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "PendingReceipt"
+                  }
+                },
+                "Property": "Pending Receipt Lines"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "labels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "legend": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Bottom'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Lines by business unit'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

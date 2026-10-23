@@ -1,0 +1,24 @@
+BU,AREA,Region ID,Region Name,Region Manager,Territory ID,Territory Name,Field Associate,Email Address,Acct #,OWNER - REP,OWNER - CONSIGN,REP,CONSIGN
+DIV-A,Area A1,A-R1,North (A1),Manager A1,A-T01,Territory A01,Associate A01,associate.a01@example.com,,MARLOW QUINN,MARLOW QUINN,MARLOW QUINN,MARLOW QUINN
+DIV-A,Area A1,A-R1,North (A1),Manager A1,A-T05,Territory A05,Associate A05,associate.a05@example.com,,MARLOW QUINN,MARLOW QUINN,MARLOW QUINN,MARLOW QUINN
+DIV-A,Area A1,A-R1,North (A1),Manager A1,A-T09,Territory A09,Associate A09,associate.a09@example.com,,MARLOW QUINN,MARLOW QUINN,MARLOW QUINN,MARLOW QUINN
+DIV-A,Area A1,A-R1,North (A1),Manager A1,A-T13,Territory A13,Associate A13,associate.a13@example.com,,MARLOW QUINN,MARLOW QUINN,MARLOW QUINN,MARLOW QUINN
+DIV-A,Area A2,A-R2,South (A2),Manager A2,A-T02,Territory A02,Associate A02,associate.a02@example.com,,TESSA BRANDT,TESSA BRANDT,TESSA BRANDT,TESSA BRANDT
+DIV-A,Area A2,A-R2,South (A2),Manager A2,A-T06,Territory A06,Associate A06,associate.a06@example.com,,TESSA BRANDT,TESSA BRANDT,TESSA BRANDT,TESSA BRANDT
+DIV-A,Area A2,A-R2,South (A2),Manager A2,A-T10,Territory A10,Associate A10,associate.a10@example.com,,TESSA BRANDT,TESSA BRANDT,TESSA BRANDT,TESSA BRANDT
+DIV-A,Area A2,A-R2,South (A2),Manager A2,A-T14,Territory A14,Associate A14,associate.a14@example.com,,TESSA BRANDT,TESSA BRANDT,TESSA BRANDT,TESSA BRANDT
+DIV-A,Area A3,A-R3,East (A3),Manager A3,A-T03,Territory A03,Associate A03,associate.a03@example.com,,RAVI OKAFOR,RAVI OKAFOR,RAVI OKAFOR,RAVI OKAFOR
+DIV-A,Area A3,A-R3,East (A3),Manager A3,A-T07,Territory A07,Associate A07,associate.a07@example.com,,RAVI OKAFOR,RAVI OKAFOR,RAVI OKAFOR,RAVI OKAFOR
+DIV-A,Area A3,A-R3,East (A3),Manager A3,A-T11,Territory A11,Associate A11,associate.a11@example.com,,RAVI OKAFOR,RAVI OKAFOR,RAVI OKAFOR,RAVI OKAFOR
+DIV-A,Area A4,A-R4,West (A4),Manager A4,A-T04,Territory A04,Associate A04,associate.a04@example.com,,NOOR CASTELLAN,NOOR CASTELLAN,NOOR CASTELLAN,NOOR CASTELLAN
+DIV-A,Area A4,A-R4,West (A4),Manager A4,A-T08,Territory A08,Associate A08,associate.a08@example.com,,NOOR CASTELLAN,NOOR CASTELLAN,NOOR CASTELLAN,NOOR CASTELLAN
+DIV-A,Area A4,A-R4,West (A4),Manager A4,A-T12,Territory A12,Associate A12,associate.a12@example.com,,NOOR CASTELLAN,NOOR CASTELLAN,NOOR CASTELLAN,NOOR CASTELLAN
+DIV-B,Area B1,B-R1,North (B1),Manager B1,B-T01,Territory B01,Associate B01,associate.b01@example.com,,ELIAS VARGA,ELIAS VARGA_OPEN,ELIAS VARGA,ELIAS VARGA_OPEN
+DIV-B,Area B1,B-R1,North (B1),Manager B1,B-T04,Territory B04,Associate B04,associate.b04@example.com,,ELIAS VARGA,ELIAS VARGA_OPEN,ELIAS VARGA,ELIAS VARGA_OPEN
+DIV-B,Area B1,B-R1,North (B1),Manager B1,B-T07,Territory B07,Associate B07,associate.b07@example.com,,ELIAS VARGA,ELIAS VARGA_OPEN,ELIAS VARGA,ELIAS VARGA_OPEN
+DIV-B,Area B2,B-R2,South (B2),Manager B2,B-T02,Territory B02,Associate B02,associate.b02@example.com,,MINA HALLORAN,MINA HALLORAN,MINA HALLORAN,MINA HALLORAN
+DIV-B,Area B2,B-R2,South (B2),Manager B2,B-T05,Territory B05,Associate B05,associate.b05@example.com,,MINA HALLORAN,MINA HALLORAN,MINA HALLORAN,MINA HALLORAN
+DIV-B,Area B2,B-R2,South (B2),Manager B2,B-T08,Territory B08,Associate B08,associate.b08@example.com,,MINA HALLORAN,MINA HALLORAN,MINA HALLORAN,MINA HALLORAN
+DIV-B,Area B3,B-R3,East (B3),Manager B3,B-T03,Territory B03,Associate B03,associate.b03@example.com,,JONAS PRYCE,JONAS PRYCE,JONAS PRYCE,JONAS PRYCE
+DIV-B,Area B3,B-R3,East (B3),Manager B3,B-T06,Territory B06,Associate B06,associate.b06@example.com,,JONAS PRYCE,JONAS PRYCE,JONAS PRYCE,JONAS PRYCE
+DIV-B,Area B3,B-R3,East (B3),Manager B3,B-T09,Territory B09,Associate B09,associate.b09@example.com,,JONAS PRYCE,JONAS PRYCE,JONAS PRYCE,JONAS PRYCE

@@ -1,0 +1,60 @@
+expression DataFolder = "C:\PendingReceiptDemo\data\" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 1b0f3c52-7a11-4d2e-9c84-5e6a2f0d9a01
+
+	annotation PBI_ResultType = Text
+
+expression src_MatDoc =
+		let
+		    Source = Csv.Document(File.Contents(DataFolder & "matdoc.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+		    Typed = Table.TransformColumnTypes(Promoted, {{"movement_type", type text}, {"reference", type text}, {"matdoc_no", type text}, {"sku", type text}, {"batch", type text}, {"plant", type text}, {"product_division", type text}, {"posting_date", type date}, {"quantity", type number}})
+		in
+		    Typed
+	lineageTag: 6e8c34db-7605-4277-afde-9d6516d02a7b
+
+	annotation PBI_ResultType = Table
+
+expression src_FieldInventory =
+		let
+		    Source = Csv.Document(File.Contents(DataFolder & "field_inventory.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+		    Typed = Table.TransformColumnTypes(Promoted, {{"branch", type text}, {"customer_no", type text}, {"sku", type text}, {"description", type text}, {"batch", type text}, {"vendor_batch", type text}, {"serial", type text}, {"customer_name", type text}, {"territory", type text}, {"ta_region", type text}, {"tis_region", type text}, {"tis_territory", type text}, {"sold_to", type text}, {"expiry", type date}, {"qty_in_transit", type number}})
+		in
+		    Typed
+	lineageTag: 9b102de4-c798-4b01-a57d-27696d1907b1
+
+	annotation PBI_ResultType = Table
+
+expression src_Return =
+		let
+		    Source = Csv.Document(File.Contents(DataFolder & "returns.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+		    Typed = Table.TransformColumnTypes(Promoted, {{"plant", type text}, {"sku", type text}, {"batch", type text}, {"quantity", type number}})
+		in
+		    Typed
+	lineageTag: de5b4a86-3753-4157-9b07-5da964c2b924
+
+	annotation PBI_ResultType = Table
+
+expression src_Tracking =
+		let
+		    Source = Csv.Document(File.Contents(DataFolder & "tracking.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+		    Typed = Table.TransformColumnTypes(Promoted, {{"delivery_no", type text}, {"carrier", type text}, {"tracking", type text}})
+		in
+		    Typed
+	lineageTag: 4f1c2a7e-8b3d-4d65-a9e0-2c7b51d3f604
+
+	annotation PBI_ResultType = Table
+
+expression src_FieldHistory =
+		let
+		    Source = Csv.Document(File.Contents(DataFolder & "field_history.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+		    Typed = Table.TransformColumnTypes(Promoted, {{"plant", type text}, {"sku", type text}, {"batch", type text}, {"a", type number}, {"c", type number}, {"d", type number}, {"b", type number}})
+		in
+		    Typed
+	lineageTag: 7d2b5c1e-3a94-4f08-b6e1-9c0a4d8e5f27
+
+	annotation PBI_ResultType = Table
+

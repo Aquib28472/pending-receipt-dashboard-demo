@@ -1,0 +1,753 @@
+/// One row per in-transit unit at an in-scope plant (distribution centres DC* plus field plants FLD1-FLD3), with its latest issue and the issue-minus-receipt netting result. Two business units: DIV-A and DIV-B. All data in this demo is synthetic.
+table PendingReceipt
+	lineageTag: 90b07f84-997d-4122-a9eb-9c803d67613d
+
+	measure Lines = COUNTROWS(PendingReceipt)
+		formatString: #,0
+		lineageTag: abf94573-97b7-422a-8ede-08d9875df33c
+
+	measure 'Units In Transit' = SUM(PendingReceipt[Qty In Transit])
+		formatString: #,0
+		lineageTag: 7b954946-40f4-4f6b-a9ac-fd29cd265b2c
+
+	measure 'Pending Receipt Lines' = CALCULATE([Lines], PendingReceipt[Status] = "Pending receipt")
+		formatString: #,0
+		lineageTag: c7a27262-5d49-4437-9c66-3b2018af606c
+
+	measure 'Pending Receipt Units' = CALCULATE([Units In Transit], PendingReceipt[Status] = "Pending receipt")
+		formatString: #,0
+		lineageTag: 4158b8da-5209-45ad-8d1c-300ea699a605
+
+	measure 'Possible Lines' = CALCULATE([Lines], PendingReceipt[Status] = "Pending receipt - possible (return in same batch)")
+		formatString: #,0
+		lineageTag: 0955d13f-976b-4b5d-a5f9-42abce98b73d
+
+	measure 'Possible Units' = CALCULATE([Units In Transit], PendingReceipt[Status] = "Pending receipt - possible (return in same batch)")
+		formatString: #,0
+		lineageTag: 84430e89-ac9d-4432-81bd-d36c47cc3b30
+
+	measure 'No Tracking Lines' = CALCULATE([Lines], PendingReceipt[Status] IN {"Pending receipt", "Pending receipt - possible (return in same batch)"}, PendingReceipt[Tracking Status] = "No tracking on delivery")
+		formatString: #,0
+		lineageTag: 5d8a3c71-2f94-4e06-b1a7-9c0e4d6f8a55
+
+	measure 'Partly Scanned Lines' = CALCULATE([Lines], PendingReceipt[Status] IN {"Pending receipt", "Pending receipt - possible (return in same batch)"}, NOT(ISBLANK(PendingReceipt[Last Scan Date])))
+		formatString: #,0
+		lineageTag: 9e2b6f40-7c15-4a83-8d39-1a5c0b7e4f66
+
+	measure 'Return In Transit Lines' = CALCULATE([Lines], PendingReceipt[Status] = "In transit - return (no warehouse receipt yet)")
+		formatString: #,0
+		lineageTag: e1ad4388-095e-41ea-9732-c28108a2b113
+
+	measure 'Return In Transit Units' = CALCULATE([Units In Transit], PendingReceipt[Status] = "In transit - return (no warehouse receipt yet)")
+		formatString: #,0
+		lineageTag: eaadcde8-b4cb-47c1-961b-79c517e707ee
+
+	measure 'Verify Lines' = CALCULATE([Lines], PendingReceipt[Status] = "Receipt already posted per extract - verify")
+		formatString: #,0
+		lineageTag: 2b18b467-0765-4be4-bc29-5309d995675b
+
+	measure 'Verify Units' = CALCULATE([Units In Transit], PendingReceipt[Status] = "Receipt already posted per extract - verify")
+		formatString: #,0
+		lineageTag: b2b10af3-73a5-4a5f-a3c7-98d70e9a6736
+
+	measure 'Overdue Pending Lines' = CALCULATE([Lines], PendingReceipt[Status] = "Overdue pending receipt - issue older than 24 months")
+		formatString: #,0
+		lineageTag: 1c3455ec-7081-4934-bda3-0917815458aa
+
+	measure 'Overdue Pending Units' = CALCULATE([Units In Transit], PendingReceipt[Status] = "Overdue pending receipt - issue older than 24 months")
+		formatString: #,0
+		lineageTag: 315b5bc8-c52c-43ad-9bec-a19bb717dbda
+
+	measure 'Pending Share' = DIVIDE([Pending Receipt Lines], [Lines])
+		formatString: 0.0%
+		lineageTag: 663d44bb-cc5a-4b94-a114-958cee39cb3f
+
+	measure 'Avg Age Days (Pending)' = CALCULATE(AVERAGE(PendingReceipt[Age Days]), PendingReceipt[Status] = "Pending receipt")
+		formatString: 0.0
+		lineageTag: bcc28383-8682-4495-bf1e-ba793817d697
+
+	measure 'Oldest Pending Days' = CALCULATE(MAX(PendingReceipt[Age Days]), PendingReceipt[Status] = "Pending receipt")
+		formatString: #,0
+		lineageTag: 2919a5cb-1a2d-4869-8bd5-e8ff399d64f9
+
+	measure 'Customers Pending' = CALCULATE(DISTINCTCOUNT(PendingReceipt[Customer No]), PendingReceipt[Status] = "Pending receipt")
+		formatString: #,0
+		lineageTag: 910e3cd1-b3e9-4147-8b5e-a806982855a1
+
+	measure 'Open Receipt Docs' = CALCULATE(DISTINCTCOUNT(PendingReceipt[Receipt Doc]), PendingReceipt[Status] = "Pending receipt")
+		formatString: #,0
+		lineageTag: 0af80c83-a03e-48b5-91a3-d7215ff2930d
+
+	measure 'Last Refreshed' = MAX(PendingReceipt[Loaded At])
+		formatString: General Date
+		lineageTag: 0654e267-9e6c-4dc7-be5c-3b9543ef118b
+
+	measure 'Old Return Lines' = CALCULATE([Lines], PendingReceipt[Status] = "Old return never cleared (no warehouse receipt)")
+		lineageTag: 0c12ca62-d5f3-41d8-ad75-2137e55d4c2b
+
+	measure 'Old Return Units' = CALCULATE([Units In Transit], PendingReceipt[Status] = "Old return never cleared (no warehouse receipt)")
+		lineageTag: b29b02f0-1a79-47b7-9e4a-ece06c8d2ef3
+
+	measure 'Unexplained Stock Lines' = CALCULATE([Lines], PendingReceipt[Status] = "Old stock in transit - no open issue or return in ERP")
+		lineageTag: 9482437a-d379-4270-999e-80a2a612541c
+
+	measure 'Unexplained Stock Units' = CALCULATE([Units In Transit], PendingReceipt[Status] = "Old stock in transit - no open issue or return in ERP")
+		lineageTag: a88b4263-4190-47b8-8edf-d17917ffbdda
+
+	column BU
+		dataType: string
+		lineageTag: a51983a9-9faa-4017-bf11-a281c1ea847d
+		summarizeBy: none
+		sourceColumn: BU
+
+		annotation SummarizationSetBy = Automatic
+
+	column Plant
+		dataType: string
+		lineageTag: 5c2f80fb-1db4-4da0-8423-dbb002cd3d6f
+		summarizeBy: none
+		sourceColumn: Plant
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Receipt Doc'
+		dataType: string
+		lineageTag: 3d84f57f-9b0a-43a1-9c83-4c3a0320e375
+		summarizeBy: none
+		sourceColumn: Receipt Doc
+
+		annotation SummarizationSetBy = Automatic
+
+	column Delivery
+		dataType: string
+		lineageTag: e9802a0c-4afd-41eb-bb65-01611218d33f
+		summarizeBy: none
+		sourceColumn: Delivery
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DC Tracking'
+		dataType: string
+		lineageTag: 7a3e9c10-52d4-4b8e-9f61-0d2a8c4e5b11
+		summarizeBy: none
+		sourceColumn: DC Tracking
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DC Carrier'
+		dataType: string
+		lineageTag: 1b6d4f82-93a7-4c05-8e2d-6f0c3a9d7e22
+		summarizeBy: none
+		sourceColumn: DC Carrier
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Last Scan Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: c85e2a47-0f19-4d3b-b6a8-9e4d1f7c3a33
+		summarizeBy: none
+		sourceColumn: Last Scan Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Tracking Status'
+		dataType: string
+		lineageTag: 2e9f7b13-6c40-4a58-8d17-5b3a0e8c9d44
+		summarizeBy: none
+		sourceColumn: Tracking Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Material Document No'
+		dataType: string
+		lineageTag: ea7d8708-4ecd-4df4-b131-257bfcd71c29
+		summarizeBy: none
+		sourceColumn: Material Document No
+
+		annotation SummarizationSetBy = Automatic
+
+	column Batch
+		dataType: string
+		lineageTag: 81544564-3bed-41d8-80fb-9057f2463d58
+		summarizeBy: none
+		sourceColumn: Batch
+
+		annotation SummarizationSetBy = Automatic
+
+	column Serial
+		dataType: string
+		lineageTag: d8919ea2-7c5c-442b-b7c1-3b423cabac18
+		summarizeBy: none
+		sourceColumn: Serial
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer No'
+		dataType: string
+		lineageTag: 5f2a8988-c6d5-4d14-a600-ae5c99c455d9
+		summarizeBy: none
+		sourceColumn: Customer No
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer Name'
+		dataType: string
+		lineageTag: b2542886-2b29-488c-9e95-40c97de6cfa8
+		summarizeBy: none
+		sourceColumn: Customer Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sales Territory'
+		dataType: string
+		lineageTag: 5b13de44-2f39-4b35-8d99-3b769b032d98
+		summarizeBy: none
+		sourceColumn: Sales Territory
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product SKU'
+		dataType: string
+		lineageTag: d0ddd803-ef7c-4130-bfc6-0d8f5acdf10d
+		summarizeBy: none
+		sourceColumn: Product SKU
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Description'
+		dataType: string
+		lineageTag: 6f01fed2-94d6-48b5-a6ba-3ccf30e93d65
+		summarizeBy: none
+		sourceColumn: Product Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Qty In Transit'
+		dataType: double
+		formatString: #,0
+		lineageTag: 2106619f-fa7d-4cd3-83c6-d9ea784a3c06
+		summarizeBy: sum
+		sourceColumn: Qty In Transit
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue Posting Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: b9f05092-58af-4e42-b056-8f8861d13d0a
+		summarizeBy: none
+		sourceColumn: Issue Posting Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Status
+		dataType: string
+		lineageTag: fa201c9c-ef64-496e-be99-4add5217b059
+		summarizeBy: none
+		sourceColumn: Status
+		sortByColumn: 'Status Sort'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Qty Issued'
+		dataType: double
+		formatString: #,0
+		lineageTag: 07a5d38f-eae6-4a4b-838f-384c8731a0b4
+		summarizeBy: sum
+		sourceColumn: Qty Issued
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Qty Received'
+		dataType: double
+		formatString: #,0
+		lineageTag: e8dca603-5323-4d55-be01-7aa439dd44ed
+		summarizeBy: sum
+		sourceColumn: Qty Received
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Outstanding Qty'
+		dataType: double
+		formatString: #,0
+		lineageTag: 19b9c839-6648-420f-9697-443365d16ccb
+		summarizeBy: sum
+		sourceColumn: Outstanding Qty
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Key In-Transit Units'
+		dataType: double
+		formatString: #,0
+		lineageTag: ceb15c47-8aec-429f-8745-bda585ff54d7
+		summarizeBy: sum
+		sourceColumn: Key In-Transit Units
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Key Return Units'
+		dataType: double
+		formatString: #,0
+		lineageTag: 06fa86c8-741a-433e-b26c-66d051a7b057
+		summarizeBy: sum
+		sourceColumn: Key Return Units
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Matched On'
+		dataType: string
+		lineageTag: ffbc23fd-849e-4ab7-a982-f6a928a953cf
+		summarizeBy: none
+		sourceColumn: Matched On
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Loaded At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 47ec9421-5594-46f7-bafb-79be0d5c5cd9
+		summarizeBy: none
+		sourceColumn: Loaded At
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Status Sort'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1f9ba044-c09e-41d8-8e14-6e3472f16617
+		summarizeBy: none
+		sourceColumn: Status Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Region ID'
+		dataType: string
+		isHidden
+		lineageTag: 37c83909-0f96-48de-be4e-0ae96c9eec24
+		summarizeBy: none
+		sourceColumn: Region ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Territory ID'
+		dataType: string
+		isHidden
+		lineageTag: acb71aa6-0cc1-4728-94f2-74a1ae8eb322
+		summarizeBy: none
+		sourceColumn: Territory ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Ship To No'
+		dataType: string
+		isHidden
+		lineageTag: 51463adf-9af4-422c-8514-6e5a3bd68a37
+		summarizeBy: none
+		sourceColumn: Ship To No
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sold To No'
+		dataType: string
+		isHidden
+		lineageTag: 80def84f-441d-4ce9-9c5b-03a5afc31d15
+		summarizeBy: none
+		sourceColumn: Sold To No
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Age Days' = IF(ISBLANK(PendingReceipt[Issue Posting Date]), BLANK(), DATEDIFF(PendingReceipt[Issue Posting Date], TODAY(), DAY))
+		dataType: int64
+		formatString: 0
+		lineageTag: 4abc7662-df4f-4a87-a4d9-28cbcb86963d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Age Bucket Sort' = IF(ISBLANK(PendingReceipt[Age Days]), 6, IF(PendingReceipt[Age Days] <= 7, 1, IF(PendingReceipt[Age Days] <= 14, 2, IF(PendingReceipt[Age Days] <= 30, 3, IF(PendingReceipt[Age Days] <= 60, 4, 5)))))
+		dataType: int64
+		formatString: 0
+		lineageTag: ea38b7e7-478d-4c1b-91a5-77cd6fa2ce9c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Age Bucket' = SWITCH(PendingReceipt[Age Bucket Sort], 1, "0-7 days", 2, "8-14 days", 3, "15-30 days", 4, "31-60 days", 5, "60+ days", "No issue date in last 24 months")
+		dataType: string
+		lineageTag: 10ad6c9b-0941-4a55-9171-186aafae2204
+		summarizeBy: none
+		sortByColumn: 'Age Bucket Sort'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Owner Record Idx' =
+			VAR buKey = UPPER(TRIM(PendingReceipt[BU]))
+			VAR regionRaw = UPPER(TRIM(PendingReceipt[Region ID]))
+			VAR terrRaw = UPPER(TRIM(PendingReceipt[Territory ID]))
+			VAR shipTo = UPPER(TRIM(PendingReceipt[Ship To No]))
+			VAR soldTo = UPPER(TRIM(PendingReceipt[Sold To No]))
+			VAR regionKey = IF(buKey <> "" && regionRaw <> "", buKey & "|" & regionRaw)
+			VAR shipKey = IF(buKey <> "" && shipTo <> "", buKey & "|" & shipTo)
+			VAR soldKey = IF(buKey <> "" && soldTo <> "", buKey & "|" & soldTo)
+			VAR byRegion = IF(ISBLANK(regionKey), BLANK(), LOOKUPVALUE(OwnerAlignment[src_idx], OwnerAlignment[region_lookup_key], regionKey))
+			VAR byTerr = IF(terrRaw = "", BLANK(), LOOKUPVALUE(OwnerAlignment[src_idx], OwnerAlignment[territory_lookup_key], terrRaw))
+			VAR byShip = IF(ISBLANK(shipKey), BLANK(), LOOKUPVALUE(OwnerAlignment[src_idx], OwnerAlignment[acct_lookup_key], shipKey))
+			VAR bySold = IF(ISBLANK(soldKey), BLANK(), LOOKUPVALUE(OwnerAlignment[src_idx], OwnerAlignment[acct_lookup_key], soldKey))
+			RETURN IF(buKey = "", BLANK(), COALESCE(byRegion, byTerr, byShip, bySold))
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 71383eca-42d8-45b1-bd68-983ad48acba0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Owner Basis' =
+			VAR buKey = UPPER(TRIM(PendingReceipt[BU]))
+			VAR regionRaw = UPPER(TRIM(PendingReceipt[Region ID]))
+			VAR terrRaw = UPPER(TRIM(PendingReceipt[Territory ID]))
+			VAR shipTo = UPPER(TRIM(PendingReceipt[Ship To No]))
+			VAR soldTo = UPPER(TRIM(PendingReceipt[Sold To No]))
+			VAR regionKey = IF(buKey <> "" && regionRaw <> "", buKey & "|" & regionRaw)
+			VAR shipKey = IF(buKey <> "" && shipTo <> "", buKey & "|" & shipTo)
+			VAR soldKey = IF(buKey <> "" && soldTo <> "", buKey & "|" & soldTo)
+			VAR byRegion = IF(ISBLANK(regionKey), BLANK(), LOOKUPVALUE(OwnerAlignment[src_idx], OwnerAlignment[region_lookup_key], regionKey))
+			VAR byTerr = IF(terrRaw = "", BLANK(), LOOKUPVALUE(OwnerAlignment[src_idx], OwnerAlignment[territory_lookup_key], terrRaw))
+			VAR byShip = IF(ISBLANK(shipKey), BLANK(), LOOKUPVALUE(OwnerAlignment[src_idx], OwnerAlignment[acct_lookup_key], shipKey))
+			VAR bySold = IF(ISBLANK(soldKey), BLANK(), LOOKUPVALUE(OwnerAlignment[src_idx], OwnerAlignment[acct_lookup_key], soldKey))
+			RETURN
+			    IF(buKey = "", "default_no_bu",
+			    IF(NOT ISBLANK(byRegion), "region",
+			    IF(NOT ISBLANK(byTerr), "territory",
+			    IF(NOT ISBLANK(byShip), "account_ship_to",
+			    IF(NOT ISBLANK(bySold), "account_sold_to", "default_no_match")))))
+		dataType: string
+		lineageTag: ee573e6b-b40d-4667-ba85-65e1f78dd342
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Inventory Owner' =
+			VAR idx = PendingReceipt[Owner Record Idx]
+			VAR useRep = LEFT(UPPER(TRIM(PendingReceipt[Ship To No])), 5) = "80000"
+			VAR rep = IF(ISBLANK(idx), BLANK(), LOOKUPVALUE(OwnerAlignment[owner_rep], OwnerAlignment[src_idx], idx))
+			VAR consign = IF(ISBLANK(idx), BLANK(), LOOKUPVALUE(OwnerAlignment[owner_consign], OwnerAlignment[src_idx], idx))
+			VAR picked = UPPER(TRIM(IF(useRep, rep, consign)))
+			VAR o = IF(picked = "", "DEFAULT OWNER", picked)
+			VAR n = SWITCH(TRUE(), RIGHT(o, 5) = "_OPEN", 5, RIGHT(o, 7) = "_CLOSED", 7, RIGHT(o, 5) = "_TEMP", 5, 0)
+			RETURN TRIM(LEFT(o, LEN(o) - n))
+		dataType: string
+		lineageTag: f499aa81-9481-42ab-918d-502f0976b58b
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Action Group' = SWITCH(PendingReceipt[Status Sort], 1, "1 Post the receipt", 2, "2 Check, then post the receipt (return in same batch)", 3, "3 Return in transit - no PR needed", 4, "4 Verify the posting", 5, "5 Overdue - check in ERP, then post the receipt", 6, "6 Old return in transit - no PR to post", 7, "7 Old stock in transit - review the stock record", "UNMAPPED STATUS")
+		dataType: string
+		lineageTag: 25588cf3-49ad-46a4-ada3-8e789d711226
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Next Step' =
+			VAR rd = COALESCE(PendingReceipt[Receipt Doc], "n/a")
+			VAR qIss = FORMAT(COALESCE(PendingReceipt[Qty Issued], 0), "#,0")
+			VAR outQ = FORMAT(COALESCE(PendingReceipt[Outstanding Qty], 0), "#,0")
+			VAR inT = FORMAT(PendingReceipt[Qty In Transit], "#,0")
+			VAR d = FORMAT(PendingReceipt[Issue Posting Date], "d mmm yyyy")
+			VAR retU = FORMAT(COALESCE(PendingReceipt[Key Return Units], 0), "#,0")
+			RETURN
+			    SWITCH(PendingReceipt[Status Sort],
+			        1, "Issue posted " & d & " (receipt doc " & rd & "); " & outQ & " of " & qIss & " still waiting for the receipt. Confirm the unit arrived, then post the receipt in ERP.",
+			        2, "Issue posted " & d & " (receipt doc " & rd & "), but this batch also has " & retU & " unit(s) of a return in transit (no warehouse receipt yet), so this serial may be the return. Check the unit, then post the receipt only if it is the delivery.",
+			        3, "A return is in transit for this batch and no warehouse receipt is posted yet. This is not a pending PR; the warehouse receipt is what is missing.",
+			        4, "The receipt is already posted for the full issue quantity, but Field Inventory still shows " & inT & " in transit. Check the receipt went to the right batch and quantity, then correct the stock record.",
+			        5, "The issue for this batch is older than 24 months and ERP shows more issue than receipt, so the receipt was most likely never posted. Find the issue in ERP, confirm the unit arrived, then post the receipt.",
+				        6, "ERP shows more returns than warehouse receipts for this batch at " & PendingReceipt[Plant] & ", so an old return was never closed. This is not a receipt to post. Ask the warehouse to close the return or correct the stock record.",
+				        7, "ERP shows no open issue and no open return for this batch at " & PendingReceipt[Plant] & " in its full history, so nothing explains why the unit is still in transit. Review the stock record.",
+				        "UNMAPPED STATUS - check the Status Sort mapping")
+		dataType: string
+		lineageTag: 082dd4db-a0fb-4fd3-9c59-c9c1befea170
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Delivery Key'
+		dataType: string
+		isHidden
+		lineageTag: 332e743e-5e70-4566-8375-923db84df548
+		summarizeBy: none
+		sourceColumn: Delivery Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Material Document Key'
+		dataType: string
+		isHidden
+		lineageTag: 1df09b4e-7b9f-463d-9c3f-21a0bbc89509
+		summarizeBy: none
+		sourceColumn: Material Document Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Receipt Doc Key'
+		dataType: string
+		isHidden
+		lineageTag: f71e6e4b-2af8-4634-bec3-30958626352e
+		summarizeBy: none
+		sourceColumn: Receipt Doc Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Batch Key'
+		dataType: string
+		isHidden
+		lineageTag: 20f666c9-4f1e-4646-91cd-a71f7d15bb67
+		summarizeBy: none
+		sourceColumn: Batch Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Serial Key'
+		dataType: string
+		isHidden
+		lineageTag: 6e44283f-2856-4fdc-a5dc-a0050a8ceedb
+		summarizeBy: none
+		sourceColumn: Serial Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer No Key'
+		dataType: string
+		isHidden
+		lineageTag: 9c361193-0eeb-423d-9d05-2e870250d031
+		summarizeBy: none
+		sourceColumn: Customer No Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Receipt Events'
+		dataType: int64
+		formatString: 0
+		lineageTag: 67cb3861-69cb-4da5-84c6-cd8fe35aa626
+		summarizeBy: none
+		sourceColumn: Receipt Events
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Receipt Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 9c8e45fa-71e5-4b25-9c9f-f96d7ee7157e
+		summarizeBy: none
+		sourceColumn: First Receipt Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Receipt History'
+		dataType: string
+		lineageTag: 5486127d-9da2-4b78-8890-a1038271a829
+		summarizeBy: none
+		sourceColumn: Receipt History
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Receipt Qty'
+		dataType: double
+		isHidden
+		lineageTag: 3ed77e71-601b-4a36-b9f6-13247ce77b0b
+		summarizeBy: none
+		sourceColumn: Receipt Qty
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Expiry Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 5d0b7a52-3f1c-4c1e-9a6e-2f4b8e7c1a93
+		summarizeBy: none
+		sourceColumn: Expiry Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Days To Expiry' = IF(ISBLANK(PendingReceipt[Expiry Date]), BLANK(), DATEDIFF(TODAY(), PendingReceipt[Expiry Date], DAY))
+		dataType: int64
+		formatString: 0
+		lineageTag: b1e84c6d-7a29-4f0e-8d35-6c9a2e5f7b10
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region =
+			VAR idx = PendingReceipt[Owner Record Idx]
+			VAR nm0 = IF(ISBLANK(idx), BLANK(), TRIM(LOOKUPVALUE(OwnerAlignment[region_name], OwnerAlignment[src_idx], idx)))
+			VAR nm = IF(RIGHT(nm0, 1) = ")" && SEARCH(" (", nm0, 1, 0) > 0, TRIM(LEFT(nm0, SEARCH(" (", nm0) - 1)), nm0)
+			VAR rid = TRIM(PendingReceipt[Region ID])
+			RETURN COALESCE(IF(nm = "", BLANK(), nm), IF(rid = "", BLANK(), rid), "Unassigned")
+		dataType: string
+		lineageTag: 8fcc2e4a-88fb-42b5-ab18-1a2e3029b605
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PendingReceipt = m
+		mode: import
+		source =
+				let
+				    FieldPlants = {"FLD2", "FLD1", "FLD3"},
+				    T = (v as any) as text => if v = null then "" else Text.From(v),
+				    Norm = (v as any) as text => Text.Upper(Text.Trim(T(v))),
+				    NormMat = (v as any) as text => Text.TrimStart(Norm(v), "0"),
+				    InScope = (p as text) as logical => Text.StartsWith(p, "DC") or List.Contains(FieldPlants, p),
+				    IsMC = (p as text) as logical => Text.StartsWith(p, "DC"),
+				    CleanNum = (v as any) as nullable text =>
+				        let t = Text.Trim(T(v))
+				        in if t = "" then null
+				           else if Text.Select(t, {"0".."9"}) = t then (if Text.TrimStart(t, "0") = "" then "0" else Text.TrimStart(t, "0"))
+				           else t,
+				    Raw = (v as any) as nullable text => let t = Text.Trim(T(v)) in if t = "" then null else t,
+				    LoadedAt = DateTime.LocalNow(),
+				
+				    Docs0 = Table.SelectRows(src_MatDoc, each List.Contains({"ISS", "RCP"}, Norm([movement_type])) and InScope(Norm([plant]))),
+				    Docs1 = Table.AddColumn(Docs0, "Mov_n", each Norm([movement_type]), type text),
+				    Docs2 = Table.AddColumn(Docs1, "Mat_n", each NormMat([sku]), type text),
+				    Docs3 = Table.AddColumn(Docs2, "Key", each Norm([plant]) & "|" & NormMat([sku]) & "|" & Norm([batch]), type text),
+				    Docs4 = Table.AddColumn(Docs3, "Qty_n", each if [quantity] = null then 0 else [quantity], type number),
+				    Docs5 = Table.AddColumn(Docs4, "QIss", each if [Mov_n] = "ISS" then [Qty_n] else 0, type number),
+				    Docs = Table.Buffer(Table.AddColumn(Docs5, "QRcp", each if [Mov_n] = "RCP" then [Qty_n] else 0, type number)),
+				
+				    Sums = Table.Group(Docs, {"Key"}, {{"QtyIss", each List.Sum([QIss]), type number}, {"QtyRcp", each List.Sum([QRcp]), type number}}),
+				    LatestIss = Table.Distinct(
+				        Table.Buffer(Table.Sort(Table.SelectRows(Docs, each [Mov_n] = "ISS"),
+				            {{"posting_date", Order.Descending}, {"reference", Order.Descending}, {"matdoc_no", Order.Descending}})),
+				        {"Key"}),
+				    DocAgg0 = Table.NestedJoin(Table.SelectColumns(LatestIss, {"Key", "posting_date", "reference", "matdoc_no"}), {"Key"}, Sums, {"Key"}, "S", JoinKind.Inner),
+				    DocAgg = Table.Buffer(Table.AddColumn(Table.ExpandTableColumn(DocAgg0, "S", {"QtyIss", "QtyRcp"}), "HasDoc", each true, type logical)),
+				
+				    MatBU = Table.Buffer(Table.Distinct(
+				        Table.SelectColumns(Table.AddColumn(Docs, "BU", each if Norm([product_division]) = "10" then "DIV-B" else "DIV-A", type text), {"Mat_n", "BU"}),
+				        {"Mat_n"})),
+				
+				    Ret0 = Table.AddColumn(src_Return, "RK", each Norm([plant]) & "|" & NormMat([sku]) & "|" & Norm([batch]), type text),
+				    RetByKey = Table.Group(Ret0, {"RK"}, {{"RetUnits", each List.Sum([quantity]) / 2, type number}}),
+				
+					    N = (x as nullable number) as number => if x = null then 0 else x,
+					    Hist0 = Table.AddColumn(src_FieldHistory, "HK", each Norm([plant]) & "|" & NormMat([sku]) & "|" & Norm([batch]), type text),
+					    Hist1 = Table.AddColumn(Table.AddColumn(Hist0, "OA", each N([a]) - N([c]), type number), "OD", each N([d]) - N([b]), type number),
+					    HistByKey = Table.Buffer(Table.Group(Hist1, {"HK"}, {{"HOpenA", each List.Sum([OA]), type number}, {"HOpenD", each List.Sum([OD]), type number}})),
+				
+				    Trk0 = Table.SelectRows(Table.AddColumn(src_Tracking, "Del", each CleanNum([delivery_no]), type nullable text), each [Del] <> null),
+				    Trk1 = Table.AddColumn(Trk0, "Tok", each List.Select(List.Transform(Text.Split(T([tracking]), ","), each Text.Trim(_)), each _ <> ""), type list),
+				    TrkByDel = Table.Buffer(Table.Group(Trk1, {"Del"}, {
+				        {"DC Tracking", each let s = Text.Combine(List.Distinct(List.Combine([Tok])), ", ") in if s = "" then null else s, type nullable text},
+				        {"DC Carrier", each List.First(List.Select(List.Distinct([carrier]), each _ <> null and Text.Trim(_) <> ""), null), type nullable text}})),
+				
+				    Scan0 = Table.SelectRows(Docs, each [Mov_n] = "RCP"),
+				    Scan1 = Table.SelectRows(Table.AddColumn(Scan0, "Del", each CleanNum([reference]), type nullable text), each [Del] <> null and [posting_date] <> null),
+				    ScanByDel = Table.Buffer(Table.Group(Scan1, {"Del"}, {{"Last Scan Date", each List.Max([posting_date]), type nullable date}})),
+				
+				    Ev0 = Table.SelectRows(Docs, each [Mov_n] = "RCP" and [posting_date] <> null),
+				    EvG = Table.Group(Ev0, {"Key"}, {
+				        {"Receipt Events", each Table.RowCount(_), Int64.Type},
+				        {"First Receipt Date", each List.Min([posting_date]), type nullable date},
+				        {"Receipt History", each Text.Combine(List.Transform(List.FirstN(Table.ToRecords(Table.Sort(_, {{"posting_date", Order.Descending}, {"reference", Order.Descending}})), 10), each Date.ToText(_[posting_date], "yyyy-MM-dd") & " " & (Raw(_[reference]) ?? "n/a") & " x" & Text.From(_[Qty_n])), "; "), type text},
+				        {"Receipt Qty", each List.Sum([Qty_n]), type number}}),
+				    Ev = Table.Buffer(EvG),
+				
+				    FI0 = Table.SelectRows(src_FieldInventory, each [qty_in_transit] <> null and [qty_in_transit] > 0 and InScope(Norm([branch]))),
+				    FI1 = Table.AddColumn(FI0, "Plant_n", each Norm([branch]), type text),
+				    FI2 = Table.AddColumn(FI1, "Mat_n", each NormMat([sku]), type text),
+				    FI3 = Table.AddColumn(FI2, "KeyLot", each let b = Norm([batch]) in if b = "" then null else [Plant_n] & "|" & [Mat_n] & "|" & b, type nullable text),
+				    FI4 = Table.AddColumn(FI3, "KeyVen", each let b = Norm([vendor_batch]) in if b = "" then null else [Plant_n] & "|" & [Mat_n] & "|" & b, type nullable text),
+				    FI5 = Table.ExpandTableColumn(Table.NestedJoin(FI4, {"Mat_n"}, MatBU, {"Mat_n"}, "B", JoinKind.Inner), "B", {"BU"}, {"BU_div"}),
+				    FI6 = Table.AddColumn(FI5, "BU", each let p = [Plant_n] in if p = "FLD3" then "DIV-B" else if p = "FLD1" or p = "FLD2" then "DIV-A" else [BU_div], type text),
+				    FI7 = Table.AddColumn(FI6, "Region ID", each Text.Trim(T(if [BU] = "DIV-B" then [region_b] else [region_a])), type text),
+				    FI8 = Table.AddColumn(FI7, "Territory ID", each Text.Trim(T(if [BU] = "DIV-B" then [territory_b] else [territory])), type text),
+				
+				    J1 = Table.ExpandTableColumn(Table.NestedJoin(FI8, {"KeyLot"}, DocAgg, {"Key"}, "L", JoinKind.LeftOuter),
+				        "L", {"posting_date", "reference", "matdoc_no", "QtyIss", "QtyRcp", "HasDoc"}, {"L_date", "L_ref", "L_md", "L_a", "L_c", "L_has"}),
+				    J2 = Table.ExpandTableColumn(Table.NestedJoin(J1, {"KeyVen"}, DocAgg, {"Key"}, "V", JoinKind.LeftOuter),
+				        "V", {"posting_date", "reference", "matdoc_no", "QtyIss", "QtyRcp", "HasDoc"}, {"V_date", "V_ref", "V_md", "V_a", "V_c", "V_has"}),
+				
+				    Hit = Table.AddColumn(J2, "Matched On", each if [L_has] = true then "Lot Batch" else if [V_has] = true then "Vendor Batch" else null, type nullable text),
+				    PDate = Table.AddColumn(Hit, "Issue Posting Date", each if [Matched On] = "Lot Batch" then [L_date] else if [Matched On] = "Vendor Batch" then [V_date] else null, type nullable date),
+				    PRef = Table.AddColumn(PDate, "Ref_x", each if [Matched On] = "Lot Batch" then [L_ref] else if [Matched On] = "Vendor Batch" then [V_ref] else null, type nullable text),
+				    PMd = Table.AddColumn(PRef, "Md_x", each if [Matched On] = "Lot Batch" then [L_md] else if [Matched On] = "Vendor Batch" then [V_md] else null, type nullable text),
+				    PA = Table.AddColumn(PMd, "Qty Issued", each if [Matched On] = "Lot Batch" then [L_a] else if [Matched On] = "Vendor Batch" then [V_a] else null, type nullable number),
+				    PC = Table.AddColumn(PA, "Qty Received", each if [Matched On] = "Lot Batch" then [L_c] else if [Matched On] = "Vendor Batch" then [V_c] else null, type nullable number),
+				    POut = Table.AddColumn(PC, "Outstanding Qty", each if [Qty Issued] = null then null else [Qty Issued] - [Qty Received], type nullable number),
+				    PKey = Table.AddColumn(POut, "MKey", each if [Matched On] = "Lot Batch" then [KeyLot] else if [Matched On] = "Vendor Batch" then [KeyVen] else if [KeyLot] <> null then [KeyLot] else if [KeyVen] <> null then [KeyVen] else [Plant_n] & "|" & [Mat_n] & "|", type text),
+				    TIn = Table.Group(PKey, {"MKey"}, {{"TUnits", each List.Sum([qty_in_transit]), type number}}),
+				    PT = Table.ExpandTableColumn(Table.NestedJoin(PKey, {"MKey"}, TIn, {"MKey"}, "T", JoinKind.LeftOuter), "T", {"TUnits"}, {"Key In-Transit Units"}),
+				    PR0 = Table.ExpandTableColumn(Table.NestedJoin(PT, {"MKey"}, RetByKey, {"RK"}, "R", JoinKind.LeftOuter), "R", {"RetUnits"}, {"RetUnits"}),
+				    PR = Table.AddColumn(PR0, "Key Return Units", each if [RetUnits] = null then 0 else [RetUnits], type number),
+					    PH1 = Table.ExpandTableColumn(Table.NestedJoin(PR, {"KeyLot"}, HistByKey, {"HK"}, "HL", JoinKind.LeftOuter), "HL", {"HOpenA", "HOpenD"}, {"HL_A", "HL_D"}),
+					    PH2 = Table.ExpandTableColumn(Table.NestedJoin(PH1, {"KeyVen"}, HistByKey, {"HK"}, "HV", JoinKind.LeftOuter), "HV", {"HOpenA", "HOpenD"}, {"HV_A", "HV_D"}),
+					    PHist = Table.AddColumn(Table.AddColumn(PH2, "Hist Open Issue", each if [HL_A] <> null then [HL_A] else [HV_A], type nullable number), "Hist Open Return", each if [HL_D] <> null then [HL_D] else [HV_D], type nullable number),
+				    PEvK = Table.AddColumn(PHist, "EvKey", each if Text.EndsWith([MKey], "|") then null else [MKey], type nullable text),
+				    PEv = Table.ExpandTableColumn(Table.NestedJoin(PEvK, {"EvKey"}, Ev, {"Key"}, "EvJ", JoinKind.LeftOuter), "EvJ", {"Receipt Events", "First Receipt Date", "Receipt History", "Receipt Qty"}),
+				    PStatus = Table.AddColumn(PEv, "Status", each
+				        if [Matched On] = null or [Outstanding Qty] <= 0 then
+				            (if [Key Return Units] > 0 then "In transit - return (no warehouse receipt yet)"
+				             else if [Matched On] = null and IsMC([Plant_n]) then "Overdue pending receipt - issue older than 24 months"
+				             else if [Matched On] = null and N([Hist Open Issue]) > 0 then "Overdue pending receipt - issue older than 24 months"
+				             else if [Matched On] = null and N([Hist Open Return]) > 0 then "Old return never cleared (no warehouse receipt)"
+				             else if [Matched On] = null then "Old stock in transit - no open issue or return in ERP"
+				             else "Receipt already posted per extract - verify")
+				        else if [Key Return Units] > 0 then "Pending receipt - possible (return in same batch)"
+				        else "Pending receipt", type text),
+				    PSort = Table.AddColumn(PStatus, "Status Sort", each
+				        if [Status] = "Pending receipt" then 1
+				        else if [Status] = "Pending receipt - possible (return in same batch)" then 2
+				        else if [Status] = "In transit - return (no warehouse receipt yet)" then 3
+				        else if [Status] = "Receipt already posted per extract - verify" then 4
+					        else if [Status] = "Overdue pending receipt - issue older than 24 months" then 5
+					        else if [Status] = "Old return never cleared (no warehouse receipt)" then 6
+					        else if [Status] = "Old stock in transit - no open issue or return in ERP" then 7
+				        else 99, Int64.Type),
+				    PDeliv = Table.AddColumn(PSort, "Delivery Key", each if [Matched On] <> null and IsMC([Plant_n]) then CleanNum([Ref_x]) else null, type nullable text),
+				    PMatDoc = Table.AddColumn(PDeliv, "Material Document Key", each if [Matched On] <> null and not IsMC([Plant_n]) then CleanNum([Md_x]) else null, type nullable text),
+				    PRecDoc = Table.AddColumn(PMatDoc, "Receipt Doc Key", each if [Delivery Key] <> null then [Delivery Key] else [Material Document Key], type nullable text),
+				    PTrk = Table.ExpandTableColumn(Table.NestedJoin(PRecDoc, {"Delivery Key"}, TrkByDel, {"Del"}, "TK", JoinKind.LeftOuter), "TK", {"DC Tracking", "DC Carrier"}),
+				    PScan = Table.ExpandTableColumn(Table.NestedJoin(PTrk, {"Receipt Doc Key"}, ScanByDel, {"Del"}, "SC", JoinKind.LeftOuter), "SC", {"Last Scan Date"}),
+				    PTrkSt = Table.AddColumn(PScan, "Tracking Status", each
+				        if [Delivery Key] <> null then (if [DC Tracking] <> null then "Tracking on file" else "No tracking on delivery")
+				        else if [Receipt Doc Key] <> null then "n/a - field transfer (no DC tracking)"
+				        else "n/a - no issue in last 24 months", type text),
+				
+				    Cols = Table.AddColumn(Table.AddColumn(Table.AddColumn(Table.AddColumn(Table.AddColumn(Table.AddColumn(Table.AddColumn(PTrkSt,
+				        "Plant", each [Plant_n], type text),
+				        "Batch", each Raw([batch]), type nullable text),
+				        "Serial", each Raw([serial]), type nullable text),
+				        "Customer No", each Raw([customer_no]), type nullable text),
+				        "Product SKU", each Text.Trim(T([sku])), type text),
+				        "Loaded At", each LoadedAt, type datetime),
+				        "Sales Territory", each if [Territory ID] = "" then null else [Territory ID], type nullable text),
+				    Cols2 = Table.AddColumn(Table.AddColumn(Cols, "Ship To No", each Text.Trim(T([customer_no])), type text), "Sold To No", each Text.Trim(T([sold_to])), type text),
+				    Cols3 = Table.AddColumn(Table.AddColumn(Table.AddColumn(Table.AddColumn(Table.AddColumn(Table.AddColumn(Cols2,
+				        "Delivery", each if [Delivery Key] <> null then Raw([Ref_x]) else null, type nullable text),
+				        "Material Document No", each if [Material Document Key] <> null then Raw([Md_x]) else null, type nullable text),
+				        "Receipt Doc", each if [Delivery] <> null then [Delivery] else [Material Document No], type nullable text),
+				        "Batch Key", each CleanNum([batch]), type nullable text),
+				        "Serial Key", each CleanNum([serial]), type nullable text),
+				        "Customer No Key", each CleanNum([customer_no]), type nullable text),
+				
+				    Selected = Table.SelectColumns(Cols3, {"BU", "Plant", "Receipt Doc", "Delivery", "Material Document No", "Batch", "Serial", "Customer No", "Delivery Key", "Material Document Key", "Receipt Doc Key", "Batch Key", "Serial Key", "Customer No Key", "customer_name",
+				        "Sales Territory", "Product SKU", "description", "qty_in_transit", "Issue Posting Date", "Status", "Status Sort", "Qty Issued", "Qty Received", "Outstanding Qty", "Key In-Transit Units", "Key Return Units", "Matched On", "Loaded At", "Region ID", "Territory ID", "Ship To No", "Sold To No", "DC Tracking", "DC Carrier", "Last Scan Date", "Tracking Status", "Receipt Events", "First Receipt Date", "Receipt History", "Receipt Qty", "expiry"}),
+				    Renamed = Table.RenameColumns(Selected, {{"customer_name", "Customer Name"}, {"description", "Product Description"}, {"qty_in_transit", "Qty In Transit"}, {"expiry", "Expiry Date"}}),
+				    Sorted = Table.Sort(Renamed, {{"BU", Order.Ascending}, {"Plant", Order.Ascending}, {"Status", Order.Ascending}, {"Issue Posting Date", Order.Ascending}}),
+				    Typed = Table.TransformColumnTypes(Sorted, {{"Customer Name", type nullable text}, {"Product Description", type nullable text}, {"Qty In Transit", type number}, {"Expiry Date", type nullable date}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,21 @@
+model 'Pending Receipt Dashboard'
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		fastCombine
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["src_MatDoc","src_FieldInventory","PendingReceipt","OwnerAlignment","src_Return","src_Tracking","src_FieldHistory"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling"]
+
+ref table PendingReceipt
+ref table DimDate
+ref table OwnerAlignment
+
+ref cultureInfo en-US
+

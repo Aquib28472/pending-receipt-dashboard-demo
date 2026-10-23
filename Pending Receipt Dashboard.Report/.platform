@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Pending Receipt Dashboard"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "afa66de9-7d59-4ba5-bdf8-c0577e4bfc8e"
+  }
+}

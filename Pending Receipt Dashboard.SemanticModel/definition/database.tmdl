@@ -1,0 +1,3 @@
+/// Pending receipt reconciliation demo: in-transit units that were issued but never receipt-confirmed. Synthetic data loaded from CSV files.
+database
+	compatibilityLevel: 1700
